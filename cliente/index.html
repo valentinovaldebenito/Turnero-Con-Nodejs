@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turnero</title>
+    <style>
+      * {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #1d1d1d;
+      }
+      #container {
+        background: #f0f0f0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #turnoActualContainer {
+        background: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: top;
+        width: 40%;
+        height: 200px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="title">
+        <h1>Turnero</h1>
+      </div>
+      <div id="turnoActualContainer">
+        <h2 id="turnoActual"></h2>
+        <h3 id="salaActual"></h3>
+      </div>
+      <button id="btnSiguiente">Siguiente turno</button>
+      <button id="btnRestart">Reiniciar</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const socket = io();
+        const turnoActual = document.getElementById("turnoActualContainer");
+        let salaActual = document.getElementById("salaActual");
+        const botonSiguienteTurno = document.getElementById("btnSiguiente");
+        const botonReiniciar = document.getElementById("btnRestart");
+
+        // Actualizar la pantalla cuando se reciba una actualización de turno
+        socket.on("turnoUpdate", (turno, sala) => {
+          console.log('Turno: ', turno);
+          console.log('Sala: ', sala)
+          turnoActual.innerHTML = `<h2>Turno actual: ${turno}</h2>`;
+          salaActual.innerHTML = `<h3>Sala: ${sala}</h3>`;
+        });
+
+        // Solicitar el siguiente turno al servidor
+        botonSiguienteTurno.addEventListener("click", () => {
+          socket.emit("siguienteTurno");
+        });
+
+        socket.on("turnoUpdate", (turno, sala) => {
+          turnoActual.innerHTML = `<h2>Turno actual: ${turno}</h2>`;
+          salaActual.innerHTML = `<h3>Sala: ${sala}</h3>`;
+        });
+
+        botonReiniciar.addEventListener("click", () => {
+          socket.emit("reiniciar");
+        });
+      });
+    </script>
+  </body>
+</html>
