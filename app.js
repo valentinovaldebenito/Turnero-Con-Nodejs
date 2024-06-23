@@ -7,8 +7,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 let turnoActual = 1;
-let numSala = Math.floor(Math.random() * 10) + 1;
-
+let numSala = Math.floor(Math.random() * 20) + 1;
 
 io.on("connection", (socket) => {
   console.log("Nuevo cliente conectado");
@@ -17,15 +16,18 @@ io.on("connection", (socket) => {
   socket.emit("turnoUpdate", turnoActual, numSala);
 
   // Escuchar cuando un cliente solicite el siguiente turno
-  socket.on("siguienteTurno", () => {
+  socket.on("siguienteTurno", (sala) => {
     turnoActual++;
-    numSala = Math.floor(Math.random() * 10) + 1;
-    io.emit("turnoUpdate", turnoActual, numSala);
+    sala = Math.floor(Math.random() * 20) + 1;
+    if (sala !== numSala) {
+      nuevoNumSala = Math.floor(Math.random() * 20) + 1;
+      io.emit("turnoUpdate", turnoActual, nuevoNumSala);
+    }
   });
 
   socket.on("reiniciar", () => {
     turnoActual = 1;
-    numSala = Math.floor(Math.random() * 10) + 1;
+    numSala = Math.floor(Math.random() * 20) + 1;
     io.emit("turnoUpdate", turnoActual, numSala);
   });
 
